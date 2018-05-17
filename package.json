@@ -1,5 +1,5 @@
 {
-  "name": "reactive-forms",
+  "name": "@clundberg1/reactive-forms",
   "version": "1.0.0",
   "description": "A library that will help you easily create forms in React and React Native.",
   "main": "index.js",
@@ -15,6 +15,10 @@
     "native"
   ],
   "author": "Christian Alan Lundberg",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/clundberg1/reactive-forms"
+  },
   "license": "ISC",
   "devDependencies": {
     "babel-core": "^6.10.4",
