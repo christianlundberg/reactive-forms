@@ -83,7 +83,7 @@ Both classes extend from AbstractControl and thus they share many of the same pr
 
 <pre><b>setValue(value: any) : void;</b></pre>
 
-If the control is a FormGroup, the value must be an object matching the FormGroup's structure (It will throw an error if it's missing any keys or has extra ones). If the control is a FormControl, it'll smply set its value.
+If the control is a FormGroup, the value must be an object matching the FormGroup's structure (It will throw an error if it's missing any keys or has extra ones). If the control is a FormControl, it'll simply set its value.
 
 ```javascript
 
@@ -203,14 +203,19 @@ console.log(this.state.form.value)
 
 ```
 
-| Props        | Definition           | Type  |
+| Props        | Definition           | Returns  |
 | ------------- |:-------------:| -----:|
-| value      | The value of the entire FormGroup | Object |
-| status      | The status of the FormGroup. If any of the FormControls are INVALID, the FormGroup is INVALID. If all the FormControls are VALID, the FormGroup will be VALID      |   "VALID" or "INVALID" |
-| errors | An object of errors or null if valid.      |    Object or null |
+| value      | The value of the entire FormGroup or a single FormControl | Object \| any |
+| status      | The status of the FormGroup. If any of the FormControls are INVALID, the FormGroup is INVALID. If all the FormControls are VALID, the FormGroup will be VALID      |   "VALID" \| "INVALID" |
+| errors | An object of errors or null if there are none.      |    Object \| null |
 | pristine | True if the control or any child controls hasn't changed value    |  boolean  |
 | dirty | True if the control or any child controls has changed value.      |    boolean |
 | untouched | True if the control or any child controls hasn't been touched      |    boolean |
 | touched | True if the control or any child controls has been touched.      |    boolean |
-
+| get(path: string\|string[]) | Method which takes the path to a control: <code>.get("address.street")</code>   |    AbstractControl |
+| markAsTouched() | Sets the control's touched property to true, and all its child controls as well. Call this function upon the blur event of an input.   |    void |
+| markAsUntouched() | Sets the control's touched property to false, and all its child controls as well.  |    void |
+| markAsDirty() | Sets the control's pristine property to false, and all its child controls as well. Both .setValue() and .patchValue() already call this method.  |    void |
+| markAsPristine() | Sets the control's pristine property to true  |    void |
+| hasError(error: string) | Checks if the ```errors``` object contains the specified error  |    boolean |
 
