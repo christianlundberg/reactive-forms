@@ -66,7 +66,7 @@ constructor(props){
   this.state = {
     form: formBuilder.group({
       username: ['', Validators.minLength(6)],
-      email: ['test@gmail.com', [Validators.required, Validators.email]],  //Make sure you aren't running the functions. Only minLength/maxLength are run because they are closures.
+      email: ['test@gmail.com', [Validators.required, Validators.email]],  //Make sure you aren't calling the functions. Only minLength/maxLength are called because they are closures.
       age: 20,
       address: formBuilder.group({
         street: '',
