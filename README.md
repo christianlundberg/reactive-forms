@@ -219,3 +219,149 @@ console.log(this.state.form.value)
 | markAsPristine() | Sets the control's pristine property to true  |    void |
 | hasError(error: string) | Checks if the ```errors``` object contains the specified error  |    boolean |
 
+
+## Full example
+
+```javascript
+import React, { Component } from 'react';
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  TouchableOpacity
+} from 'react-native';
+import { FormBuilder, Validators } from '@clundberg1/reactive-forms';
+
+
+
+export default class App extends Component {
+
+  constructor(props) {
+    super(props);
+
+    const formBuilder = new FormBuilder();
+
+    this.state = {
+      form: formBuilder.group({
+        name: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        address: formBuilder.group({
+          street: '',
+          city: ''
+        })
+      })
+    }
+
+    this.onSubmit = this.onSubmit.bind(this);
+    this.onBlur = this.onBlur.bind(this);
+    this.onChangeValue = this.onChangeValue.bind(this);
+  }
+
+  onSubmit() {
+    console.log(this.state.form.value);
+  }
+
+  onBlur(control){
+    this.state.form.get(control).markAsTouched();
+    this.forceUpdate();
+  }
+
+  onChangeValue(control, value) {
+    this.state.form.get(control).setValue(value);
+    this.forceUpdate();
+  }
+
+  renderError(control, error, message) {
+    if (this.state.form.get(control).touched && this.state.form.get(control).hasError(error))
+      return <Text style={styles.error}>{message}</Text>
+
+    return null;
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        <View style={styles.inputContainer}>
+          <TextInput
+            onBlur={() => this.onBlur('name')}
+            onChangeText={value => this.onChangeValue('name', value)}
+            value={this.state.form.value.name}
+            style={styles.input}
+            placeholder="Name..."
+          />
+          { this.renderError('name', 'required', 'The name is required') }
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            onBlur={() => this.onBlur('email')}
+            onChangeText={value => this.onChangeValue('email', value)}
+            value={this.state.form.value.email}
+            style={styles.input}
+            placeholder="Email..."
+          />
+          { this.renderError('email', 'required', 'The email is required') }
+          { this.renderError('email', 'email', "The email's format is invalid.") }
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            onBlur={() => this.onBlur('address.street')}
+            onChangeText={value => this.onChangeValue('address.street', value)}
+            value={this.state.form.value.address.street}
+            style={styles.input}
+            placeholder="Street..."
+          />
+        </View>
+        <View style={styles.inputContainer}>
+          <TextInput
+            onBlur={() => this.onBlur('address.city')}
+            onChangeText={value => this.onChangeValue('address.city', value)}
+            value={this.state.form.value.address.city}
+            style={styles.input}
+            placeholder="City..."
+          />
+        </View>
+        <TouchableOpacity
+          disabled={this.state.form.invalid}
+          onPress={this.onSubmit}
+          style={styles.button}>
+          <Text style={styles.buttonText}>SAVE</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: 20
+  },
+  inputContainer: {
+    marginBottom: 15
+  },
+  input: {
+    alignSelf: 'stretch',
+    backgroundColor: '#F2F2F2',
+    padding: 15,
+    fontSize: 20,
+    marginBottom: 2
+  },
+  button: {
+    padding: 15,
+    alignSelf: 'stretch',
+    backgroundColor: '#00ccff'
+  },
+  buttonText: {
+    fontSize: 20,
+    color: 'white',
+    textAlign: 'center',
+    fontWeight: 'bold'
+  },
+  error: {
+    color: 'red'
+  }
+});
+
+```
