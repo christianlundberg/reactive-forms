@@ -65,7 +65,7 @@ constructor(props){
   
   this.state = {
     form: formBuilder.group({
-      username: ['', Validators.minLength(6)],
+      username: ['', Validators.minlength(6)],
       email: ['test@gmail.com', [Validators.required, Validators.email]],  //Make sure you aren't calling the functions. Only minLength/maxLength are called because they are closures.
       age: 20,
       address: formBuilder.group({
@@ -77,6 +77,27 @@ constructor(props){
   };
 }
 ```
+
+| Validator        | Definition           | Returns  |
+| ------------- |:-------------:| -----:|
+| required      | The following will be invalid values: ```undefined```, ```null```, empty array, empty string, empty object and zero. Anything else shall be valid. | {required: true} \| null |
+| requiredTrue      | The control shall be valid if its value === true      | {required: true} \| null  |
+| email | The control shall be valid if it passes the email regex.   |  {email: true} \| null |
+| minlength(length: number) | Takes as an argument the desired minimum length.    |  {minlength: true} \| null  |
+| maxlength(length: number) | Takes as an argument the desired max length.    |  {maxlength: true} \| null  |
+
+These are the built in validators, and although I plan on adding more, you can easily implement your own custom validators by creating a function which receives AbstractControl and returns either null or an error object.
+
+```javascript
+export class CustomValidators {
+    static uppercase(control) {
+        if(!control.value)
+            return null;
+        return control.value === control.value.toUpperCase() ? null : { uppercase : true };
+    }
+}
+```
+
 
 ### FormGroup & FormControl
 Both classes extend from AbstractControl and thus they share many of the same properties and methods.
@@ -203,7 +224,7 @@ console.log(this.state.form.value)
 
 ```
 
-| Props        | Definition           | Returns  |
+| Props/methods        | Definition           | Returns  |
 | ------------- |:-------------:| -----:|
 | value      | The value of the entire FormGroup or a single FormControl | Object \| any |
 | status      | The status of the FormGroup. If any of the FormControls are INVALID, the FormGroup is INVALID. If all the FormControls are VALID, the FormGroup will be VALID      |   "VALID" \| "INVALID" |
@@ -218,7 +239,7 @@ console.log(this.state.form.value)
 | markAsDirty() | Sets the control's pristine property to false, and all its child controls as well. Both .setValue() and .patchValue() already call this method.  |    void |
 | markAsPristine() | Sets the control's pristine property to true  |    void |
 | hasError(error: string) | Checks if the ```errors``` object contains the specified error  |    boolean |
-
+| reset() | Resets the control with a value of ```null```, pristine and untouched |    boolean |
 
 ## Full example
 
