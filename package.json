@@ -1,6 +1,6 @@
 {
   "name": "@clundberg1/reactive-forms",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "A library that will help you easily create forms in React and React Native.",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,8 @@
   },
   "files": [
     "index.js",
-    "src"
+    "src",
+    "README.md"
   ],
   "license": "ISC",
   "devDependencies": {

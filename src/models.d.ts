@@ -20,6 +20,9 @@ export abstract class AbstractControl {
     markAsPristine(options: Options): void;
     setParent(parent: FormGroup): void;
     hasError(error: string): boolean;
+    abstract setValue(value: any): void;
+    abstract patchValue(value: any): void;
+    abstract reset(): void;
 }
 
 export class FormGroup extends AbstractControl{

@@ -71,11 +71,11 @@ describe('FormBuilder', () => {
 
     it('should set the value and validators of the form controls when using array notation', () => {
 
-        const maxLength = Validators.maxLength(10);
+        const maxlength = Validators.maxlength(10);
         
         const formGroup = formBuilder.group({
             name: ['test', Validators.required],
-            email: ['clundberg@gmail.com', [Validators.required, maxLength , Validators.email]],
+            email: ['clundberg@gmail.com', [Validators.required, maxlength , Validators.email]],
             lastname: 'lastname',
             address: formBuilder.group({
                 city: ['New York'],
@@ -98,7 +98,7 @@ describe('FormBuilder', () => {
         expect(formGroup.controls.name.validators[0]).toBe(Validators.required);
         expect(formGroup.controls.email.validators.length).toBe(3);
         expect(formGroup.controls.email.validators[0]).toBe(Validators.required);
-        expect(formGroup.controls.email.validators[1]).toBe(maxLength);
+        expect(formGroup.controls.email.validators[1]).toBe(maxlength);
         expect(formGroup.controls.email.validators[2]).toBe(Validators.email);
         
 
@@ -124,14 +124,14 @@ describe('FormBuilder', () => {
         expect(formGroup.controls.name.validators[0]).toBe(Validators.required);
         expect(formGroup.controls.email.validators.length).toBe(3);
         expect(formGroup.controls.email.validators[0]).toBe(Validators.required);
-        expect(formGroup.controls.email.validators[1]).toBe(maxLength);
+        expect(formGroup.controls.email.validators[1]).toBe(maxlength);
         expect(formGroup.controls.email.validators[2]).toBe(Validators.email);
 
         formGroup.get('email').setValue('clundberghotmail.com');
 
         expect(formGroup.controls.email.errors).toEqual({
             email: true,
-            maxLength: true
+            maxlength: true
         })
     });
 
