@@ -42,4 +42,24 @@ export class Validators {
             return control.value.length <= length ? null : { maxlength: true };
         }
     }
+
+    static min(min) {
+        return control => {
+            if (!control.value)
+                return null;
+
+            const value = parseFloat(control.value);
+            return !isNaN(value) && value < min ? { min: true } : null;
+        }
+    }
+
+    static max(max) {
+        return control => {
+            if (!control.value)
+                return null;
+
+            const value = parseFloat(control.value);
+            return !isNaN(value) && value > max ? { max: true } : null;
+        }
+    }
 }

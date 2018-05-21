@@ -52,4 +52,17 @@ describe('Validators', () => {
         expect(Validators.maxlength(4)({ value: 'Test' })).toBe(null);
         expect(Validators.maxlength(4)({ value: 'This is a test' })).toEqual({maxlength: true});
     });
+
+    it('should apply min validation correctly', () => {
+        expect(Validators.min(0)({ value: 1 })).toBe(null);
+        expect(Validators.min(0)({ value: 100 })).toBe(null);
+        expect(Validators.min(0)({ value: 0 })).toBe(null);
+        expect(Validators.min(0)({ value: -1 })).toEqual({ min: true });
+    });
+
+    it('should apply max validation correctly', () => {
+        expect(Validators.max(10)({ value: 1 })).toBe(null);
+        expect(Validators.max(10)({ value: 10 })).toBe(null);
+        expect(Validators.max(10)({ value: 100 })).toEqual({ max: true });
+    });
 });
