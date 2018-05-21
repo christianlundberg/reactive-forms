@@ -66,7 +66,7 @@ constructor(props){
   this.state = {
     form: formBuilder.group({
       username: ['', Validators.minlength(6)],
-      email: ['test@gmail.com', [Validators.required, Validators.email]],  //Make sure you aren't calling the functions. Only minLength/maxLength are called because they are closures.
+      email: ['test@gmail.com', [Validators.required, Validators.email]],  //Make sure you aren't calling the functions. Only minlength/maxlength are called because they are closures.
       age: 20,
       address: formBuilder.group({
         street: '',
@@ -85,6 +85,8 @@ constructor(props){
 | email | The control shall be valid if it passes the email regex.   |  {email: true} \| null |
 | minlength(length: number) | Takes as an argument the desired minimum length.    |  {minlength: true} \| null  |
 | maxlength(length: number) | Takes as an argument the desired max length.    |  {maxlength: true} \| null  |
+| min(min: number) | Takes as an argument the desired minimum number.    |  {min: true} \| null  |
+| max(max: number) | Takes as an argument the desired max number.    |  {max: true} \| null  |
 
 These are the built in validators, and although I plan on adding more, you can easily implement your own custom validators by creating a function which receives AbstractControl and returns either null or an error object.
 
