@@ -63,7 +63,34 @@ export class Validators {
         }
     }
 
-    static equals(c1, c2){
+    static pattern(pattern) {
+        if (!pattern)
+            throw 'The pattern is required';
+        let regex;
+        let regexStr;
+        if (typeof pattern === 'string') {
+            regexStr = '';
+
+            if (pattern.charAt(0) !== '^') regexStr += '^';
+
+            regexStr += pattern;
+
+            if (pattern.charAt(pattern.length - 1) !== '$') regexStr += '$';
+
+            regex = new RegExp(regexStr);
+        } else {
+            regexStr = pattern.toString();
+            regex = pattern;
+        }
+        return control => {
+            if (!control.value)
+                return null;
+
+            return regex.test(control.value) ? null : { pattern: true };
+        };
+    }
+
+    static equals(c1, c2) {
         return group => {
             return group.get(c1).value !== group.get(c2).value ? { equals: true } : null;
         }

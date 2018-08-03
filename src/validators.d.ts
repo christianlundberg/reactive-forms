@@ -16,5 +16,7 @@ export class Validators {
 
     static max(max: number): (control: AbstractControl) => { max: boolean } | null;
 
+    static pattern(pattern: string | RegExp): (control: AbstractControl) => { pattern: boolean } | null;
+
     static equals(c1: string, c2: string): (control: FormGroup) => { equals: boolean } | null;
 }

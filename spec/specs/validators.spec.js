@@ -68,6 +68,45 @@ describe('Validators', () => {
         expect(Validators.max(10)({ value: 100 })).toEqual({ max: true });
     });
 
+    it('should apply "pattern" validation correctly', () => {
+        expect(Validators.pattern(/[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/)({ value: 'myemail@gmail.com' })).toBe(null);
+        expect(Validators.pattern(/[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/)({ value: 'myemail@gmailcom' })).toEqual({
+            pattern: true
+        });
+        expect(Validators.pattern(/[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/)({ value: 'myemailgmail.com' })).toEqual({
+            pattern: true
+        });
+        expect(Validators.pattern(/[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/)({ value: '@myemailgmail.com' })).toEqual({
+            pattern: true
+        });
+
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: 'Testpassword1' })).toBe(null);
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: 'Testpassword' })).toEqual({
+            pattern: true
+        });
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: 'testpassword1' })).toEqual({
+            pattern: true
+        });
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: 'testpassword' })).toEqual({
+            pattern: true
+        });
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: '123123123' })).toEqual({
+            pattern: true
+        });
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: 'testPassword1' })).toBe(null);
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: '1testpassworD' })).toBe(null);
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: 't3StP4ssw0rd' })).toBe(null);
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: 't3Stpassword_' })).toEqual({
+            pattern: true
+        });
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: 't3St-password' })).toEqual({
+            pattern: true
+        });
+        expect(Validators.pattern(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])([a-zA-Z0-9]+)$/)({ value: 't3St.password' })).toEqual({
+            pattern: true
+        });
+    });
+
     it('should apply "equals" validation correctly', () => {
         const formGroup = new FormBuilder().group({
             password: ['test', Validators.required],
