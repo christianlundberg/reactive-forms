@@ -24,12 +24,12 @@ export class FormBuilder {
         return new FormControl(value, validators);
     }
 
-    group(controlsConfig) {
+    group(controlsConfig, validators) {
         if (controlsConfig instanceof Array || !(controlsConfig instanceof Object))
             throw 'The group method requires a valid object';
 
         const controls = this._reduceControls(controlsConfig);
 
-        return new FormGroup(controls);
+        return new FormGroup(controls, validators);
     }
 }

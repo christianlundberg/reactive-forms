@@ -1,4 +1,4 @@
-import { AbstractControl } from './models';
+import { AbstractControl, FormGroup } from './models';
 
 export class Validators {
 
@@ -15,4 +15,6 @@ export class Validators {
     static min(min: number): (control: AbstractControl) => { min: boolean } | null;
 
     static max(max: number): (control: AbstractControl) => { max: boolean } | null;
+
+    static equals(c1: string, c2: string): (control: FormGroup) => { equals: boolean } | null;
 }

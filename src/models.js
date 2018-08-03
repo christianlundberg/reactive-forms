@@ -170,7 +170,7 @@ export class FormGroup extends AbstractControl {
     constructor(controls, validators) {
         super();
         this.controls = controls;
-        this.validators = validators;
+        this.validators = validators ? validators instanceof Array ? validators : [validators] : null;
 
         this._setUpControls();
         this._forEachChild((control, key) => this.value[key] = control.value);

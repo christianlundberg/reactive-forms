@@ -1,4 +1,6 @@
 import { Validators } from '../../';
+import { FormGroup } from '../../src/models';
+import { FormBuilder } from '../../src/form-builder';
 
 describe('Validators', () => {
 
@@ -64,5 +66,51 @@ describe('Validators', () => {
         expect(Validators.max(10)({ value: 1 })).toBe(null);
         expect(Validators.max(10)({ value: 10 })).toBe(null);
         expect(Validators.max(10)({ value: 100 })).toEqual({ max: true });
+    });
+
+    it('should apply "equals" validation correctly', () => {
+        const formGroup = new FormBuilder().group({
+            password: ['test', Validators.required],
+            confirmPassword: 'test'
+        }, Validators.equals('password', 'confirmPassword'));
+
+        expect(formGroup.valid).toBe(true);
+        expect(formGroup.invalid).toBe(false);
+        expect(formGroup.errors).toBe(null);
+
+        expect(formGroup.get('password').valid).toBe(true);
+        expect(formGroup.get('password').invalid).toBe(false);
+        expect(formGroup.get('password').errors).toBe(null);
+
+        formGroup.get('password').setValue('test1');
+
+        expect(formGroup.valid).toBe(false);
+        expect(formGroup.invalid).toBe(true);
+        expect(formGroup.errors).toEqual({
+            equals: true
+        });
+
+        formGroup.get('confirmPassword').setValue('test1');
+
+        expect(formGroup.valid).toBe(true);
+        expect(formGroup.invalid).toBe(false);
+        expect(formGroup.errors).toBe(null);
+
+        formGroup.setValue({
+            password: '',
+            confirmPassword: 'testing123'
+        });
+
+        expect(formGroup.valid).toBe(false);
+        expect(formGroup.invalid).toBe(true);
+        expect(formGroup.errors).toEqual({
+            equals: true
+        });
+
+        expect(formGroup.get('password').valid).toBe(false);
+        expect(formGroup.get('password').invalid).toBe(true);
+        expect(formGroup.get('password').errors).toEqual({
+            required: true
+        });
     });
 });

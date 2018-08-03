@@ -62,4 +62,10 @@ export class Validators {
             return !isNaN(value) && value > max ? { max: true } : null;
         }
     }
+
+    static equals(c1, c2){
+        return group => {
+            return group.get(c1).value !== group.get(c2).value ? { equals: true } : null;
+        }
+    }
 }
