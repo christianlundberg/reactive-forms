@@ -12,8 +12,12 @@ export abstract class AbstractControl {
     dirty: boolean;
     untouched: boolean;
     touched: boolean;
+    enabled: boolean;
+    disabled: boolean;
     root: FormGroup;
     get(path: string | Array<string>): AbstractControl;
+    disable(options: Options): void;
+    enable(options: Options): void;
     markAsTouched(options: Options): void;
     markAsUntouched(options: Options): void;
     markAsDirty(options: Options): void;
@@ -25,7 +29,7 @@ export abstract class AbstractControl {
     abstract reset(): void;
 }
 
-export class FormGroup extends AbstractControl{
+export class FormGroup extends AbstractControl {
 
     controls: {
         [key: string]: AbstractControl;
@@ -42,9 +46,11 @@ export class FormGroup extends AbstractControl{
     reset(value?: {
         [key: string]: any;
     }, options?: Options): void;
+
+    getRawValue(): any;
 }
 
-export class FormControl extends AbstractControl{
+export class FormControl extends AbstractControl {
 
     setValue(value: {
         [key: string]: any;

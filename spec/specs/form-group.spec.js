@@ -27,11 +27,14 @@ describe('FormGroup', () => {
             age: 20
         });
 
-        expect(formGroup.value).toEqual({
+        const value = {
             name: 'Test',
             lastname: 'Test',
             age: 20
-        });
+        };
+
+        expect(formGroup.value).toEqual(value);
+        expect(formGroup.getRawValue()).toEqual(value);
     });
 
     it('should set the value of a nested form correctly and propagate upwards and downwards.', () => {
@@ -67,7 +70,7 @@ describe('FormGroup', () => {
             }
         });
 
-        expect(formGroup.value).toEqual({
+        const test1 = {
             name: 'Christian',
             lastname: 'Lundberg',
             address: {
@@ -78,25 +81,34 @@ describe('FormGroup', () => {
                     code: 'MX'
                 }
             }
-        });
+        }
 
-        expect(formGroup.controls.address.value).toEqual({
+        expect(formGroup.value).toEqual(test1);
+        expect(formGroup.getRawValue()).toEqual(test1);
+
+        const test2 = {
             street: 'Main',
             city: 'Test',
             country: {
                 name: 'Mexico',
                 code: 'MX'
             }
-        });
+        }
 
-        expect(formGroup.controls.address.controls.country.value).toEqual({
+        expect(formGroup.controls.address.value).toEqual(test2);
+        expect(formGroup.controls.address.getRawValue()).toEqual(test2);
+
+        const test3 = {
             name: 'Mexico',
             code: 'MX'
-        });
+        }
+
+        expect(formGroup.controls.address.controls.country.value).toEqual(test3);
+        expect(formGroup.controls.address.controls.country.getRawValue()).toEqual(test3);
 
         formGroup.controls.address.controls.street.setValue('Calle principal');
 
-        expect(formGroup.value).toEqual({
+        const test4 = {
             name: 'Christian',
             lastname: 'Lundberg',
             address: {
@@ -107,37 +119,49 @@ describe('FormGroup', () => {
                     code: 'MX'
                 }
             }
-        });
+        }
 
-        expect(formGroup.controls.address.value).toEqual({
+        expect(formGroup.value).toEqual(test4);
+        expect(formGroup.getRawValue()).toEqual(test4);
+
+        const test5 = {
             street: 'Calle principal',
             city: 'Test',
             country: {
                 name: 'Mexico',
                 code: 'MX'
             }
-        });
+        }
+
+        expect(formGroup.controls.address.value).toEqual(test5);
+        expect(formGroup.controls.address.getRawValue()).toEqual(test5);
 
         formGroup.controls.address.controls.country.setValue({
             name: 'Canada',
             code: 'CA'
         });
 
-        expect(formGroup.controls.address.controls.country.value).toEqual({
+        const test6 = {
             name: 'Canada',
             code: 'CA'
-        });
+        };
 
-        expect(formGroup.controls.address.value).toEqual({
+        expect(formGroup.controls.address.controls.country.value).toEqual(test6);
+        expect(formGroup.controls.address.controls.country.getRawValue()).toEqual(test6);
+
+        const test7 = {
             street: 'Calle principal',
             city: 'Test',
             country: {
                 name: 'Canada',
                 code: 'CA'
             }
-        });
+        }
 
-        expect(formGroup.value).toEqual({
+        expect(formGroup.controls.address.value).toEqual(test7);
+        expect(formGroup.controls.address.getRawValue()).toEqual(test7);
+
+        const test8 = {
             name: 'Christian',
             lastname: 'Lundberg',
             address: {
@@ -148,7 +172,10 @@ describe('FormGroup', () => {
                     code: 'CA'
                 }
             }
-        });
+        }
+
+        expect(formGroup.value).toEqual(test8);
+        expect(formGroup.getRawValue()).toEqual(test8);
     });
 
     it('should patch the value of a form correctly', () => {
@@ -177,7 +204,7 @@ describe('FormGroup', () => {
             }
         });
 
-        expect(formGroup.value).toEqual({
+        const test1 = {
             name: 'Christian',
             lastname: 'Lundberg',
             age: 35,
@@ -189,11 +216,14 @@ describe('FormGroup', () => {
                     code: 'US'
                 }
             }
-        });
+        }
+
+        expect(formGroup.value).toEqual(test1);
+        expect(formGroup.getRawValue()).toEqual(test1);
 
         formGroup.controls.address.controls.country.patchValue({ name: 'Mexico' });
 
-        expect(formGroup.value).toEqual({
+        const test2 = {
             name: 'Christian',
             lastname: 'Lundberg',
             age: 35,
@@ -205,9 +235,11 @@ describe('FormGroup', () => {
                     code: 'US'
                 }
             }
-        });
+        };
 
-        formGroup.controls.address.controls.country.setValue({ name: 'Mexico', code: 'MX' });
+        expect(formGroup.value).toEqual(test2);
+        expect(formGroup.getRawValue()).toEqual(test2);
+
     });
 
     it('should get the root control', () => {
@@ -480,7 +512,7 @@ describe('FormGroup', () => {
             })
         });
 
-        expect(formGroup.value).toEqual({
+        const test1 = {
             name: 'Christian',
             lastname: 'Lundberg',
             age: 25,
@@ -492,7 +524,10 @@ describe('FormGroup', () => {
                     code: 'US'
                 }
             }
-        });
+        };
+
+        expect(formGroup.value).toEqual(test1);
+        expect(formGroup.getRawValue()).toEqual(test1);
 
         expect(formGroup.valid).toBe(true);
         expect(formGroup.get('address').valid).toBe(true);
@@ -501,7 +536,7 @@ describe('FormGroup', () => {
 
         formGroup.reset();
 
-        expect(formGroup.value).toEqual({
+        const test2 = {
             name: null,
             lastname: null,
             age: null,
@@ -513,7 +548,10 @@ describe('FormGroup', () => {
                     code: null
                 }
             }
-        });
+        }
+
+        expect(formGroup.value).toEqual(test2);
+        expect(formGroup.getRawValue()).toEqual(test2);
 
         expect(formGroup.valid).toBe(false);
         expect(formGroup.get('address').valid).toBe(false);
@@ -529,7 +567,7 @@ describe('FormGroup', () => {
             }
         });
 
-        expect(formGroup.value).toEqual({
+        const test3 = {
             name: null,
             lastname: null,
             age: 20,
@@ -541,11 +579,14 @@ describe('FormGroup', () => {
                     code: null
                 }
             }
-        });
+        }
+
+        expect(formGroup.value).toEqual(test3);
+        expect(formGroup.getRawValue()).toEqual(test3);
 
         formGroup.get('address.country').reset();
 
-        expect(formGroup.value).toEqual({
+        const test4 = {
             name: null,
             lastname: null,
             age: 20,
@@ -557,6 +598,227 @@ describe('FormGroup', () => {
                     code: null
                 }
             }
+        }
+
+        expect(formGroup.value).toEqual(test4);
+        expect(formGroup.getRawValue()).toEqual(test4);
+    });
+
+    it('should disable/enable FormGroup and FormControls', () => {
+        const formGroup = new FormBuilder().group({
+            name: ['Christian', Validators.required],
+            lastname: 'Lundberg',
+            age: 25,
+            address: formBuilder.group({
+                street: 'Main',
+                city: ['New York', Validators.required],
+                country: formBuilder.group({
+                    name: 'United States',
+                    code: 'US'
+                })
+            })
         });
+
+        formGroup.get('address').disable();
+
+        expect(formGroup.value).toEqual({
+            name: 'Christian',
+            lastname: 'Lundberg',
+            age: 25
+        });
+
+        expect(formGroup.getRawValue()).toEqual({
+            name: 'Christian',
+            lastname: 'Lundberg',
+            age: 25,
+            address: {
+                street: 'Main',
+                city: 'New York',
+                country: {
+                    name: 'United States',
+                    code: 'US'
+                }
+            }
+        });
+
+        expect(formGroup.status).toBe('VALID');
+        expect(formGroup.enabled).toBe(true);
+        expect(formGroup.disabled).toBe(false);
+        expect(formGroup.get('name').status).toBe('VALID');
+        expect(formGroup.get('name').enabled).toBe(true);
+        expect(formGroup.get('name').disabled).toBe(false);
+        expect(formGroup.get('lastname').status).toBe('VALID');
+        expect(formGroup.get('lastname').enabled).toBe(true);
+        expect(formGroup.get('lastname').disabled).toBe(false);
+        expect(formGroup.get('age').status).toBe('VALID');
+        expect(formGroup.get('age').enabled).toBe(true);
+        expect(formGroup.get('age').disabled).toBe(false);
+        expect(formGroup.get('address').status).toBe('DISABLED');
+        expect(formGroup.get('address').enabled).toBe(false);
+        expect(formGroup.get('address').disabled).toBe(true);
+
+        formGroup.get('age').disable();
+
+        expect(formGroup.value).toEqual({
+            name: 'Christian',
+            lastname: 'Lundberg'
+        });
+
+        expect(formGroup.getRawValue()).toEqual({
+            name: 'Christian',
+            lastname: 'Lundberg',
+            age: 25,
+            address: {
+                street: 'Main',
+                city: 'New York',
+                country: {
+                    name: 'United States',
+                    code: 'US'
+                }
+            }
+        });
+
+        expect(formGroup.status).toBe('VALID');
+        expect(formGroup.enabled).toBe(true);
+        expect(formGroup.disabled).toBe(false);
+        expect(formGroup.get('name').status).toBe('VALID');
+        expect(formGroup.get('name').enabled).toBe(true);
+        expect(formGroup.get('name').disabled).toBe(false);
+        expect(formGroup.get('lastname').status).toBe('VALID');
+        expect(formGroup.get('lastname').enabled).toBe(true);
+        expect(formGroup.get('lastname').disabled).toBe(false);
+        expect(formGroup.get('age').status).toBe('DISABLED');
+        expect(formGroup.get('age').enabled).toBe(false);
+        expect(formGroup.get('age').disabled).toBe(true);
+        expect(formGroup.get('address').status).toBe('DISABLED');
+        expect(formGroup.get('address').enabled).toBe(false);
+        expect(formGroup.get('address').disabled).toBe(true);
+
+        formGroup.get('lastname').disable();
+
+        expect(formGroup.value).toEqual({
+            name: 'Christian'
+        });
+
+        expect(formGroup.getRawValue()).toEqual({
+            name: 'Christian',
+            lastname: 'Lundberg',
+            age: 25,
+            address: {
+                street: 'Main',
+                city: 'New York',
+                country: {
+                    name: 'United States',
+                    code: 'US'
+                }
+            }
+        });
+
+        expect(formGroup.status).toBe('VALID');
+        expect(formGroup.enabled).toBe(true);
+        expect(formGroup.disabled).toBe(false);
+        expect(formGroup.get('name').status).toBe('VALID');
+        expect(formGroup.get('name').enabled).toBe(true);
+        expect(formGroup.get('name').disabled).toBe(false);
+        expect(formGroup.get('lastname').status).toBe('DISABLED');
+        expect(formGroup.get('lastname').enabled).toBe(false);
+        expect(formGroup.get('lastname').disabled).toBe(true);
+        expect(formGroup.get('age').status).toBe('DISABLED');
+        expect(formGroup.get('age').enabled).toBe(false);
+        expect(formGroup.get('age').disabled).toBe(true);
+        expect(formGroup.get('address').status).toBe('DISABLED');
+        expect(formGroup.get('address').enabled).toBe(false);
+        expect(formGroup.get('address').disabled).toBe(true);
+
+        formGroup.get('name').disable();
+
+        expect(formGroup.getRawValue()).toEqual({
+            name: 'Christian',
+            lastname: 'Lundberg',
+            age: 25,
+            address: {
+                street: 'Main',
+                city: 'New York',
+                country: {
+                    name: 'United States',
+                    code: 'US'
+                }
+            }
+        });
+
+        expect(formGroup.status).toBe('DISABLED');
+        expect(formGroup.enabled).toBe(false);
+        expect(formGroup.disabled).toBe(true);
+        expect(formGroup.get('name').status).toBe('DISABLED');
+        expect(formGroup.get('name').enabled).toBe(false);
+        expect(formGroup.get('name').disabled).toBe(true);
+        expect(formGroup.get('lastname').status).toBe('DISABLED');
+        expect(formGroup.get('lastname').enabled).toBe(false);
+        expect(formGroup.get('lastname').disabled).toBe(true);
+        expect(formGroup.get('age').status).toBe('DISABLED');
+        expect(formGroup.get('age').enabled).toBe(false);
+        expect(formGroup.get('age').disabled).toBe(true);
+        expect(formGroup.get('address').status).toBe('DISABLED');
+        expect(formGroup.get('address').enabled).toBe(false);
+        expect(formGroup.get('address').disabled).toBe(true);
+
+        formGroup.get('address').enable();
+
+        expect(formGroup.value).toEqual({
+            address: {
+                street: 'Main',
+                city: 'New York',
+                country: {
+                    name: 'United States',
+                    code: 'US'
+                }
+            }
+        });
+
+        expect(formGroup.getRawValue()).toEqual({
+            name: 'Christian',
+            lastname: 'Lundberg',
+            age: 25,
+            address: {
+                street: 'Main',
+                city: 'New York',
+                country: {
+                    name: 'United States',
+                    code: 'US'
+                }
+            }
+        });
+
+        expect(formGroup.status).toBe('VALID');
+        expect(formGroup.enabled).toBe(true);
+        expect(formGroup.disabled).toBe(false);
+        expect(formGroup.get('name').status).toBe('DISABLED');
+        expect(formGroup.get('name').enabled).toBe(false);
+        expect(formGroup.get('name').disabled).toBe(true);
+        expect(formGroup.get('lastname').status).toBe('DISABLED');
+        expect(formGroup.get('lastname').enabled).toBe(false);
+        expect(formGroup.get('lastname').disabled).toBe(true);
+        expect(formGroup.get('age').status).toBe('DISABLED');
+        expect(formGroup.get('age').enabled).toBe(false);
+        expect(formGroup.get('age').disabled).toBe(true);
+        expect(formGroup.get('address').status).toBe('VALID');
+        expect(formGroup.get('address').enabled).toBe(true);
+        expect(formGroup.get('address').disabled).toBe(false);
+
+        formGroup.get('name').setValue('');
+
+        expect(formGroup.status).toBe('VALID');
+
+        formGroup.get('name').enable();
+
+        expect(formGroup.status).toBe('INVALID');
+
+        formGroup.get('address.city').setValue('');
+
+        expect(formGroup.status).toBe('INVALID');
+
+        formGroup.get('address.city').disable();
+
+        expect(formGroup.get('address').status).toBe('VALID');
     });
 });

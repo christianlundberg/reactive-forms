@@ -18,6 +18,29 @@ export class AbstractControl {
 
     touched = false;
 
+    disable(options = {}) {
+        this.status = DISABLED;
+        this.errors = null;
+        this._forEachChild(control => control.disable({ onlySelf: true }));
+        this._updateValue();
+        this._updateAncestors(options);
+    }
+
+    enable(options = {}) {
+        this.status = VALID;
+        this._forEachChild(control => control.enable({ onlySelf: true }));
+        this.updateValueAndValidity({ onlySelf: true });
+        this._updateAncestors(options);
+    }
+
+    _updateAncestors(opts) {
+        if (this.parent && !opts.onlySelf) {
+            this.parent.updateValueAndValidity(opts);
+            this.parent._updatePristine();
+            this.parent._updateTouched();
+        }
+    }
+
     _forEachChild() { }
 
     _updateTouched(options = {}) {
@@ -45,6 +68,7 @@ export class AbstractControl {
     }
 
     _calculateStatus() {
+        if (this._allControlsDisabled()) return DISABLED;
         if (this.errors || this._hasInvalidControls())
             return INVALID;
         return VALID;
@@ -62,10 +86,13 @@ export class AbstractControl {
     }
 
     updateValueAndValidity(options = {}) {
-        this.status = VALID;
+        this.status = this._allControlsDisabled() ? DISABLED : VALID;
         this._updateValue();
-        this.errors = this._runValidators();
-        this.status = this._calculateStatus();
+
+        if (this.enabled) {
+            this.errors = this._runValidators();
+            this.status = this._calculateStatus();
+        }
 
         if (this.parent && !options.onlySelf)
             this.parent.updateValueAndValidity(options);
@@ -144,6 +171,14 @@ export class AbstractControl {
         return this.status === INVALID;
     }
 
+    get enabled() {
+        return this.status !== DISABLED;
+    }
+
+    get disabled() {
+        return this.status === DISABLED;
+    }
+
     get untouched() {
         return !this.touched;
     }
@@ -177,12 +212,28 @@ export class FormGroup extends AbstractControl {
         this.updateValueAndValidity({ onlySelf: true });
     }
 
+    _allControlsDisabled() {
+        for (const controlName of Object.keys(this.controls)) {
+            if (this.controls[controlName].enabled) {
+                return false;
+            }
+        }
+        return Object.keys(this.controls).length > 0 || this.disabled;
+    }
+
     _setUpControls() {
         this._forEachChild(control => control.setParent(this))
     }
 
     _forEachChild(cb) {
         Object.keys(this.controls).forEach(k => cb(this.controls[k], k));
+    }
+
+    _reduceChildren(initValue, fn) {
+        let res = initValue;
+        this._forEachChild(
+            (control, name) => { res = fn(res, control, name); });
+        return res;
     }
 
     _updateValue() {
@@ -193,10 +244,19 @@ export class FormGroup extends AbstractControl {
         const value = {};
 
         this._forEachChild((control, name) => {
-            value[name] = control.value;
+            if (control.enabled || this.disabled)
+                value[name] = control.value;
         });
 
         return value;
+    }
+
+    getRawValue() {
+        return this._reduceChildren(
+            {}, (acc, control, name) => {
+                acc[name] = control instanceof FormControl ? control.value : control.getRawValue();
+                return acc;
+            });
     }
 
     setValue(value, options) {
@@ -229,7 +289,7 @@ export class FormGroup extends AbstractControl {
     }
 
     reset(value = {}, options = {}) {
-        
+
         this._forEachChild((control, name) => {
             control.reset(value[name], { onlySelf: true });
         });
@@ -250,6 +310,10 @@ export class FormControl extends AbstractControl {
     }
 
     _updateValue() { }
+
+    _allControlsDisabled() {
+        return this.disabled;
+    }
 
     setValue(value, options) {
         this.value = value;
