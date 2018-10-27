@@ -9,6 +9,8 @@ To install the latest version of reactive-forms, simply run:
 ```
 npm install --save @clundberg1/reactive-forms
 ```
+## API
++ [FormBuilder](#formbuilder)
 
 ## Usage
 
@@ -267,6 +269,411 @@ export class CustomValidators {
         return control.value === control.value.toUpperCase() ? null : { uppercase : true };
     }
 }
+```
+### FormGroup & FormControl
+Both classes share mostly the same properties and methods. The only difference is on the FormControl class, they refer to a single control, and on a FormGroup they apply to the combined child controls.
+
+#### Properties
+
+##### value: any
+The values of all enabled controls as an object.
+
+```javascript
+
+  const formBuilder = new FormBuilder();
+  
+  this.form = formBuilder.group({
+      username: '',
+      email: 'test@gmail.com',
+      age: '',
+      address: formBuilder.group({
+        street: '',
+        city: '',
+        state: ''
+      })
+   });
+   
+   console.log(this.form.value)
+   
+   /*
+   {
+      username: '',
+      email: 'test@gmail.com',
+      age: '',
+      address: {
+        street: '',
+        city: '',
+        state: ''
+      }
+   }
+   */
+   
+   console.log(this.form.get('address').value);
+   /*
+    {
+      street: '',
+      city: '',
+      state: ''
+     }
+   */
+   
+   //get the value of a single FormControl.
+   
+   console.log(this.form.get('email').value) //'test@gmail.com'
+   
+```
+##### status: string ("VALID" | "INVALID" | "DISABLED")
++ Disabled if all of the controls are disabled.
++ Invalid if any of the controls are invalid.
++ Valid if all the controls are valid.
+
+```javascript
+
+  const formBuilder = new FormBuilder();
+  
+  this.form = formBuilder.group({
+      username: ['', Validators.required],
+      email: 'test@gmail.com',
+      age: '',
+      address: formBuilder.group({
+        street: '',
+        city: '',
+        state: ''
+      })
+   });
+   
+   console.log(this.form.status) // "INVALID"
+   console.log(this.form.get('username').status) // "INVALID"   
+   console.log(this.form.get('address').status) // "VALID"   
+```
+
+##### valid: boolean
+True if status is "VALID".
+
+```javascript
+   console.log(this.form.valid)
+```
+
+##### invalid: boolean
+True if status is "INVALID".
+
+```javascript
+   console.log(this.form.invalid)
+```
+
+##### errors: { [key: string]: any }
+All the errors the control has, merged into a single object. 
+
+```javascript
+   this.form = formBuilder.group({
+      username: ['Samuel', [Validators.minlength(8), CustomValidators.uppercase]] //for some reason you want username to be all uppercase
+   });
+   
+   console.log(this.form.get('username').errors)
+   
+   /*
+   {
+      minlength: true,
+      uppercase: true
+   }
+   */
+```
+
+##### pristine: boolean
++ FormControl: True if the control hasn't changed value.
++ FormGroup: True if none of the controls have changed value.
+
+```javascript
+   console.log(this.form.pristine)
+```
+
+##### dirty: boolean
++ FormControl: True if the control has changed value.
++ FormGroup: True if any of the controls have changed value.
+
+```javascript
+   console.log(this.form.dirty)
+```
+
+##### untouched: boolean
++ FormControl: True if the control has not been marked as touched (blur event)
++ FormGroup: True if none of the controls have been marked as touched.
+```javascript
+   console.log(this.form.untouched)
+```
+
+##### touched: boolean
++ FormControl: True if the control has been marked as touched (blur event)
++ FormGroup: True if any of the controls have been marked as touched.
+```javascript
+   console.log(this.form.untouched)
+```
+
+##### enabled: boolean
++ FormControl: True if the control's status is not "DISABLED".
++ FormGroup: True if any of the control's are not "DISABLED".
+```javascript
+   console.log(this.form.enabled)
+```
+
+##### disabled: boolean
++ FormControl: True if the control's status is "DISABLED".
++ FormGroup: True if all of the control's are "DISABLED".
+```javascript
+   console.log(this.form.disabled)
+```
+
+#### Methods
+
+##### setValue: void
+
++ FormControl: Sets its value.
++ FormGroup: Set the value of the controls. You must pass an object with the exact same structure as the one of the FormGroup or it'll throw an error. 
+
+It also sets the control's pristine property to false, because the control's value has been changed.
+
+###### Arguments
+
++ FormControl
+    + value: any
++ FormGroup
+    + controls: { [control: string ]: any }
+
+###### Example
+
+```javascript
+
+this.form = formBuilder.group({
+   username: '',
+   password: ''
+});
+
+this.form.get('username').setValue('my_name'); //sets the value of a single control
+console.log(this.form.value);
+/*
+   {
+      username: 'my_name',
+      password: ''
+   }
+*/
+
+this.form.setValue({
+  username: 'my_name' //throws an error because it's missing the password.
+});
+
+this.form.setValue({
+  id: 1234
+  username: 'my_name', //Also would throw error because there isn't a FormControl named "id".
+  password: 'x1PPDasa3'
+});
+
+this.form.setValue({
+  username: 'my_name', //this is ok
+  password: 'x1PPDasa3'
+});
+
+```
+
+##### patchValue: void
+
++ FormControl: Same as setValue.
++ FormGroup: Set the value of the controls. This method won't throw an error if the object's missing or has extra keys.
+
+It also sets the control's pristine property to false, because the control's value has been changed.
+
+###### Arguments
+
++ FormControl
+    + value: any
++ FormGroup
+    + controls: { [control: string ]: any }
+
+###### Example
+
+```javascript
+
+this.form = formBuilder.group({
+   username: '',
+   password: ''
+});
+
+this.form.get('username').patchValue('my_name'); //sets the value of a single control
+console.log(this.form.value);
+/*
+   {
+      username: 'my_name',
+      password: ''
+   }
+*/
+
+this.form.patchValue({
+  username: 'my_name' 
+});
+
+console.log(this.form.value);
+/*
+   {
+      username: 'my_name',
+      password: ''
+   }
+*/
+
+this.form.setValue({
+  id: 1234 //The "id" property is simply ignored
+  username: 'my_name', 
+  password: 'x1PPDasa3'
+});
+
+console.log(this.form.value);
+/*
+   {
+      username: 'my_name',
+      password: 'x1PPDasa3'
+   }
+*/
+
+```
+
+##### reset: void
+
++ FormControl: Reset the control to null.
++ FormGroup: Reset all of its controls to null.
+
+It also sets the control's pristine and untouched properties to true. You can optionally pass the value you want the control to be reset to.
+
+###### Arguments
+
++ FormControl
+    + value: any
++ FormGroup
+    + controls: { [control: string ]: any }
+
+###### Example
+
+```javascript
+
+this.form = formBuilder.group({
+   username: 'my_name',
+   password: 'my_password'
+});
+
+this.form.get('username').reset(); 
+console.log(this.form.value);
+/*
+   {
+      username: null,
+      password: 'my_password'
+   }
+*/
+
+this.form.reset({
+  username: 'new_name',
+  password: 'new_password'
+});
+
+console.log(this.form.value);
+/*
+   {
+      username: 'new_name',
+      password: 'new_password'
+   }
+*/
+
+```
+
+##### disable: void
+
++ FormControl: Disable the control
++ FormGroup: Disable all of the group's controls.
+
+Disabled controls are ignored when calculating a FormGroup's status or value, so this is useful for controls which can be hidden: simply disable them and they won't be validated nor will their value appear in the FormGroup's value. If you need the entire FormGroup's value including disabled controls, call the getRawValue method.
+
+
+###### Example
+
+```javascript
+
+this.form = formBuilder.group({
+   username: ['', Validators.required],
+   password: ''
+});
+
+this.form.get('username').disable(); 
+console.log(this.form.value);
+/*
+   {
+      password: ''
+   }
+*/
+
+console.log(this.form.getRawValue());
+
+/*
+   {
+      username: '',
+      password: ''
+   }
+*/
+
+console.log(this.form.get('username').status) //"DISABLED"
+console.log(this.form.get('username').enabled) //false
+console.log(this.form.get('username').disabled) //true
+console.log(this.form.valid) //true. The FormGroup is valid because the username is disabled thus not validated.
+```
+
+##### enable: void
+
++ FormControl: Enable the control
++ FormGroup: Enable all of the group's controls.
+
+##### get: FormGroup | FormControl
+Returns a child control given a control's path or name.
+
+###### Arguments
+
++ path: string | string[]
+
+###### Example
+
+```javascript
+
+this.form = formBuilder.group({
+   name: '',
+   address: formBuilder.group({
+      street: '',
+      city: ''
+   })
+});
+
+const addressGroup = this.form.get('address');
+const streetControl = this.form.get('address.street') //access nested controls
+const cityControl = this.form.get(['address', 'city']) //or this way
+```
+##### hasError: boolean
+Whether the control has the specified error.
+
+###### Arguments
+
++ error: string
+
+###### Example
+
+```javascript
+
+this.form = formBuilder.group({
+   name: ['', Validators.required]
+});
+
+console.log(this.form.get('name').errors)
+
+/*
+{
+  required: true
+}
+*/
+
+console.log(this.form.get('name').hasError('required')) //true
+console.log(this.form.get('name').hasError('minlength')) //false
 ```
 
 ## Full example
