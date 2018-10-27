@@ -11,6 +11,42 @@ npm install --save @clundberg1/reactive-forms
 ```
 ## API
 + [FormBuilder](#formbuilder)
+    + [group](#group)
++ [Validators](#validators)
+    + [required](#required)
+    + [requiredTrue](#requiredtrue)
+    + [email](#email)
+    + [minlength](#minlength)
+    + [maxlength](#maxlength)
+    + [min](#min)
+    + [max](#max)
+    + [pattern](#pattern)
++ [Form Group Validation](#form-group-validation)
+    + [equals](#equals)
++ [Custom Validation](#custom-validation)
++ [FormGroup And FormControl](#formgroup-and-formcontrol)
+    + [Properties](#properties)
+        + [value](#value-any)
+        + [status](#status-string)
+        + [valid](#valid-boolean)
+        + [invalid](#invalid-boolean)
+        + [errors](#errors-any)
+        + [pristine](#pristine-boolean)
+        + [dirty](#dirty-boolean)
+        + [untouched](#untouched-boolean)
+        + [touched](#touched-boolean)
+        + [enabled](#enabled-boolean)
+        + [disabled](#disabled-boolean)
+    + [Methods](#methods)
+        + [setValue](#setvalue-void)
+        + [patchValue](#patchvalue-void)
+        + [reset](#reset-void)
+        + [disable](#disable-void)
+        + [enable](#enable-void)
+        + [get](#get-abstractcontrol)
+        + [hasError](#haserror-boolean)
+        + [getRawValue](#getrawvalue-any)
++ [Full Example](#full-example)
 
 ## Usage
 
@@ -270,7 +306,7 @@ export class CustomValidators {
     }
 }
 ```
-### FormGroup & FormControl
+### FormGroup And FormControl
 Both classes share mostly the same properties and methods. The only difference is on the FormControl class, they refer to a single control, and on a FormGroup they apply to the combined child controls.
 
 #### Properties
@@ -322,7 +358,8 @@ The values of all enabled controls as an object.
    console.log(this.form.get('email').value) //'test@gmail.com'
    
 ```
-##### status: string ("VALID" | "INVALID" | "DISABLED")
+___
+##### status: string
 + Disabled if all of the controls are disabled.
 + Invalid if any of the controls are invalid.
 + Valid if all the controls are valid.
@@ -346,22 +383,22 @@ The values of all enabled controls as an object.
    console.log(this.form.get('username').status) // "INVALID"   
    console.log(this.form.get('address').status) // "VALID"   
 ```
-
+___
 ##### valid: boolean
 True if status is "VALID".
 
 ```javascript
    console.log(this.form.valid)
 ```
-
+___
 ##### invalid: boolean
 True if status is "INVALID".
 
 ```javascript
    console.log(this.form.invalid)
 ```
-
-##### errors: { [key: string]: any }
+___
+##### errors: any
 All the errors the control has, merged into a single object. 
 
 ```javascript
@@ -378,7 +415,7 @@ All the errors the control has, merged into a single object.
    }
    */
 ```
-
+___
 ##### pristine: boolean
 + FormControl: True if the control hasn't changed value.
 + FormGroup: True if none of the controls have changed value.
@@ -386,7 +423,7 @@ All the errors the control has, merged into a single object.
 ```javascript
    console.log(this.form.pristine)
 ```
-
+___
 ##### dirty: boolean
 + FormControl: True if the control has changed value.
 + FormGroup: True if any of the controls have changed value.
@@ -394,28 +431,28 @@ All the errors the control has, merged into a single object.
 ```javascript
    console.log(this.form.dirty)
 ```
-
+___
 ##### untouched: boolean
 + FormControl: True if the control has not been marked as touched (blur event)
 + FormGroup: True if none of the controls have been marked as touched.
 ```javascript
    console.log(this.form.untouched)
 ```
-
+___
 ##### touched: boolean
 + FormControl: True if the control has been marked as touched (blur event)
 + FormGroup: True if any of the controls have been marked as touched.
 ```javascript
    console.log(this.form.untouched)
 ```
-
+___
 ##### enabled: boolean
 + FormControl: True if the control's status is not "DISABLED".
 + FormGroup: True if any of the control's are not "DISABLED".
 ```javascript
    console.log(this.form.enabled)
 ```
-
+___
 ##### disabled: boolean
 + FormControl: True if the control's status is "DISABLED".
 + FormGroup: True if all of the control's are "DISABLED".
@@ -473,7 +510,7 @@ this.form.setValue({
 });
 
 ```
-
+___
 ##### patchValue: void
 
 + FormControl: Same as setValue.
@@ -533,7 +570,7 @@ console.log(this.form.value);
 */
 
 ```
-
+___
 ##### reset: void
 
 + FormControl: Reset the control to null.
@@ -580,7 +617,7 @@ console.log(this.form.value);
 */
 
 ```
-
+___
 ##### disable: void
 
 + FormControl: Disable the control
@@ -620,15 +657,15 @@ console.log(this.form.get('username').enabled) //false
 console.log(this.form.get('username').disabled) //true
 console.log(this.form.valid) //true. The FormGroup is valid because the username is disabled thus not validated.
 ```
-
+___
 ##### enable: void
 
 + FormControl: Enable the control
 + FormGroup: Enable all of the group's controls.
 
-##### get: FormGroup | FormControl
+##### get: AbstractControl
 Returns a child control given a control's path or name.
-
+___
 ###### Arguments
 
 + path: string | string[]
@@ -649,6 +686,7 @@ const addressGroup = this.form.get('address');
 const streetControl = this.form.get('address.street') //access nested controls
 const cityControl = this.form.get(['address', 'city']) //or this way
 ```
+___
 ##### hasError: boolean
 Whether the control has the specified error.
 
@@ -675,7 +713,39 @@ console.log(this.form.get('name').errors)
 console.log(this.form.get('name').hasError('required')) //true
 console.log(this.form.get('name').hasError('minlength')) //false
 ```
+___
+##### getRawValue: any
+Returns the value of the FormGroup including disabled controls.
 
+###### Example
+
+```javascript
+
+this.form = formBuilder.group({
+   username: 'my_username',
+   password: 'my_password'
+});
+
+this.form.get('password').disable()
+
+console.log(this.form.value);
+
+/*
+{
+  username: 'my_username'
+}
+*/
+
+console.log(this.form.getRawValue());
+
+/*
+{
+  username: 'my_username',
+  password: 'my_password'
+}
+*/
+
+```
 ## Full example
 
 ```javascript
@@ -698,16 +768,14 @@ export default class App extends Component {
 
     const formBuilder = new FormBuilder();
 
-    this.state = {
-      form: formBuilder.group({
+    this.form: formBuilder.group({
         name: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         address: formBuilder.group({
           street: '',
           city: ''
         })
-      })
-    }
+      });
 
     this.onSubmit = this.onSubmit.bind(this);
     this.onBlur = this.onBlur.bind(this);
@@ -715,21 +783,21 @@ export default class App extends Component {
   }
 
   onSubmit() {
-    console.log(this.state.form.value);
+    console.log(this.form.value);
   }
 
   onBlur(control){
-    this.state.form.get(control).markAsTouched();
+    this.form.get(control).markAsTouched();
     this.forceUpdate();
   }
 
   onChangeValue(control, value) {
-    this.state.form.get(control).setValue(value);
+    this.form.get(control).setValue(value);
     this.forceUpdate();
   }
 
   renderError(control, error, message) {
-    if (this.state.form.get(control).touched && this.state.form.get(control).hasError(error))
+    if (this.form.get(control).touched && this.form.get(control).hasError(error))
       return <Text style={styles.error}>{message}</Text>
 
     return null;
@@ -742,7 +810,7 @@ export default class App extends Component {
           <TextInput
             onBlur={() => this.onBlur('name')}
             onChangeText={value => this.onChangeValue('name', value)}
-            value={this.state.form.value.name}
+            value={this.form.value.name}
             style={styles.input}
             placeholder="Name..."
           />
@@ -752,7 +820,7 @@ export default class App extends Component {
           <TextInput
             onBlur={() => this.onBlur('email')}
             onChangeText={value => this.onChangeValue('email', value)}
-            value={this.state.form.value.email}
+            value={this.form.value.email}
             style={styles.input}
             placeholder="Email..."
           />
@@ -763,7 +831,7 @@ export default class App extends Component {
           <TextInput
             onBlur={() => this.onBlur('address.street')}
             onChangeText={value => this.onChangeValue('address.street', value)}
-            value={this.state.form.value.address.street}
+            value={this.form.value.address.street}
             style={styles.input}
             placeholder="Street..."
           />
@@ -772,7 +840,7 @@ export default class App extends Component {
           <TextInput
             onBlur={() => this.onBlur('address.city')}
             onChangeText={value => this.onChangeValue('address.city', value)}
-            value={this.state.form.value.address.city}
+            value={this.form.value.address.city}
             style={styles.input}
             placeholder="City..."
           />
