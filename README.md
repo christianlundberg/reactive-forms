@@ -1,8 +1,8 @@
-# reactive-forms
+# Reactive Forms
 
-Easily create forms and manage their state in React and React Native.
+Easily create a representation of your forms and manage their state in React and React Native. 
 
-### Installing
+### Installation
 
 To install the latest version of reactive-forms, simply run:
 
@@ -10,85 +10,254 @@ To install the latest version of reactive-forms, simply run:
 npm install --save @clundberg1/reactive-forms
 ```
 
-## Docs
+## Usage
 
 ### FormBuilder
 
-This is a helper class that will help you get a ```FormGroup``` instance. 
+This is a helper class that will get you a ```FormGroup``` instance. 
 
-<pre><b>group(controls: Object) : FormGroup;</b></pre>
+#### group
 
-Use the group method to get a FormGroup instance. It takes as an argument an object where the keys are the names of the ```FormControl```s and the value is the initial value for that form control.
+Pass it an object with the structure of your form. You can optionally pass it a Function or an Array of Functions which will validate at the FormGroup level. It returns an instance of FormGroup.
+
+##### Arguments
+
++ controls : { [key: string]: any } (required)
++ validators : Function | Function[] (optional) 
+
+##### Example
 
 ```javascript
 
 import { FormBuilder } from '@clundberg1/reactive-forms';
 
-const formBuilder = new FormBuilder();
+...
+
+constructor(props){
+  super(props);
+  
+  const formBuilder = new FormBuilder();
+  
+  this.form = formBuilder.group({
+      username: '',
+      email: '',
+      age: ''
+   });
+}
+```
+
+When creating a FormGroup, you can initialize your controls with any value and easily create nested forms:
+
+```javascript
+
+import { FormBuilder } from '@clundberg1/reactive-forms';
 
 ...
 
 constructor(props){
   super(props);
   
-  this.state = {
-    form: formBuilder.group({
+  const formBuilder = new FormBuilder();
+  
+  this.form = formBuilder.group({
       username: '',
-      email: 'test@gmail.com',
-      age: 20,
-      address: formBuilder.group({  //easily create nested groups
+      email: 'test@gmail.com', //initialize a form control with a value
+      age: '',
+      address: formBuilder.group({  //easily create nested forms
         street: '',
         city: '',
         state: ''
       })
-    });
-  };
+   });
 }
 ```
 
 ### Validators
 
-A class consisting of (common) validator methods.
+A class consisting of validator functions.
 
-When using the FormBuilder class, instead of passing the value directly to each FormControl, you can pass an array. The first element must be the value, while the second must be the validator(s).
+If your controls require validation, instead of passing the value directly, you can pass an Array where the first element will be the initial value, and the second can either be a Validator Function or an Array of Validator Functions. 
+
+##### Example
 
 ```javascript
 
 import { FormBuilder, Validators } from '@clundberg1/reactive-forms';
-
-const formBuilder = new FormBuilder();
 
 ...
 
 constructor(props){
   super(props);
   
-  this.state = {
-    form: formBuilder.group({
+  const formBuilder = new FormBuilder();
+  
+  this.form = formBuilder.group({
       username: ['', Validators.minlength(6)],
       email: ['test@gmail.com', [Validators.required, Validators.email]],  //Make sure you aren't calling the functions. Only minlength/maxlength are called because they are closures.
-      age: 20,
+      age: '',
       address: formBuilder.group({
         street: '',
         city: '',
         state: ''
       })
     });
-  };
 }
 ```
+___
+#### required
 
-| Validator        | Definition           | Returns  |
-| ------------- |:-------------:| -----:|
-| required      | The following will be invalid values: ```undefined```, ```null```, empty array, empty string, empty object and zero. Anything else shall be valid. | {required: true} \| null |
-| requiredTrue      | The control shall be valid if its value === true      | {required: true} \| null  |
-| email | The control shall be valid if it passes the email regex.   |  {email: true} \| null |
-| minlength(length: number) | Takes as an argument the desired minimum length.    |  {minlength: true} \| null  |
-| maxlength(length: number) | Takes as an argument the desired max length.    |  {maxlength: true} \| null  |
-| min(min: number) | Takes as an argument the desired minimum number.    |  {min: true} \| null  |
-| max(max: number) | Takes as an argument the desired max number.    |  {max: true} \| null  |
+Validation for a control to have a value. The control will be invalid if its value is one of the following: undefined, null, [], {}, '', 0.
 
-These are the built in validators, and although I plan on adding more, you can easily implement your own custom validators by creating a function which receives AbstractControl and returns either null or an error object.
+##### Example
+
+```javascript
+
+formBuilder.group({
+   username: ['', Validators.required]
+});
+```
+___
+#### requiredTrue
+
+Validation for a control's value to be true. Useful for checkboxes.
+
+##### Example
+
+```javascript
+
+formBuilder.group({
+   isAdult: [false, Validators.requiredTrue]
+});
+```
+___
+#### email
+
+Validation for a control to have an email format.
+
+##### Example
+
+```javascript
+
+formBuilder.group({
+   email: ['', Validators.email]
+});
+```
+___
+#### minlength
+
+Validation for a control's required min length.
+
+##### Arguments
+
++ length : number (required)
+
+##### Example
+
+```javascript
+
+formBuilder.group({
+   username: ['', Validators.minlength(8)]
+});
+```
+___
+#### maxlength
+
+Validation for a control's required max length.
+
+##### Arguments
+
++ length : number (required)
+
+##### Example
+
+```javascript
+
+formBuilder.group({
+   username: ['', Validators.minlength(8)]
+});
+```
+___
+#### min
+
+Validation for a control's minimum value.
+
+##### Arguments
+
++ min : number (required)
+
+##### Example
+
+```javascript
+
+formBuilder.group({
+   age: [0, Validators.min(18)]
+});
+```
+___
+#### max
+
+Validation for a control's max value.
+
+##### Arguments
+
++ max : number (required)
+
+##### Example
+
+```javascript
+
+formBuilder.group({
+   age: [0, Validators.max(13)]
+});
+```
+___
+#### pattern
+
+Regex validation for a control.
+
+##### Arguments
+
++ pattern : RegExp | string (required)
+
+##### Example
+
+```javascript
+
+const emailPattern = /[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?/
+
+formBuilder.group({
+   email: ['', Validators.pattern(emailPattern)]
+});
+```
+### Form Group Validation
+
+You can also validate an entire FormGroup. This is useful when you need to apply validation at the FormGroup level, these validators will run whenever any of the group's FormControls changes its value. 
+
+#### equals
+
+Validator that requires two controls to have the same value.
+
+##### Arguments
+
++ c1 : string (required)
++ c2 : string (required)
+
+##### Example
+
+```javascript
+
+formBuilder.group({
+   password: ['', Validators.required],
+   confirmPassword: ['']
+}, Validators.equals('password', 'confirmPassword'));
+```
+
+
+### Custom Validation
+
+Those were the built in validators, but this clearly does not cover all validation. So what if you need to implement your own custom validation? It's quite simple actually. As seen previously, a validator is simply a function that receives a FormGroup or a FormControl and returns null (if valid) or an object with the key being the name of your error.
+
+##### Example
 
 ```javascript
 export class CustomValidators {
@@ -99,149 +268,6 @@ export class CustomValidators {
     }
 }
 ```
-
-
-### FormGroup & FormControl
-Both classes extend from AbstractControl and thus they share many of the same properties and methods.
-
-<pre><b>setValue(value: any) : void;</b></pre>
-
-If the control is a FormGroup, the value must be an object matching the FormGroup's structure (It will throw an error if it's missing any keys or has extra ones). If the control is a FormControl, it'll simply set its value.
-
-```javascript
-
-constructor(props){
-  super(props);
-  
-  this.state = {
-    form: formBuilder.group({
-      username: '',
-      email: ''
-      age: null,
-      address: formBuilder.group({
-        street: '',
-        city: '',
-        state: ''
-      })
-    });
-  };
-  
-  //We need to do this so that React re-renders
-
-  this.setState(prevState => { 
-    return {
-      form: {
-        ...this.state.form.setValue({
-            username: 'user123',
-            email: 'user@gmail.com',
-            age: 20,
-            address: {
-              street: 'Main st.',
-              city: 'NYC',
-              state: 'NY'
-            }
-          })
-        }
-      }
-  })
-  
-  console.log(this.state.form.value)
-  
-  /*
- {
-    username: 'user123',
-    email: 'user@gmail.com',
-    age: 20,
-    address: {
-      street: 'Main st.',
-      city: 'NYC',
-      state: 'NY'
-    }
-  }
-  */
-  
-  this.state.form.get('age').setValue(25);
-  
-  console.log(this.state.form.value);
-  
-  /*
-   {
-      username: 'user123',
-      email: 'user@gmail.com',
-      age: 25,
-      address: {
-        street: 'Main st.',
-        city: 'NYC',
-        state: 'NY'
-      }
-    }
-  */
-  
-  //Assuming this is too tedious, you could force React to re-render:
-  
-  this.state.form.setValue({
-      username: 'user123',
-      email: 'user@gmail.com',
-      age: 20,
-      address: {
-        street: 'Main st.',
-        city: 'NYC',
-        state: 'NY'
-      }
-  });
-    
-   this.forceUpdate();
-}
-
-```
-
-<pre><b>patchValue(value: any) : void;</b></pre>
-
-It works similar to setValue. The only difference is if the control is a FormGroup, it will not throw an error if the value has extra or missing keys. 
-
-```javascript
-...
-
-this.state.form.patchValue({
-  id: 100, //This would throw an error with setValue since our FormGroup doesn't have an "id" FormControl. Here, it'll simply be ignored.
-  username: 'great_name'
-})
-
-console.log(this.state.form.value)
-
- /*
-   {
-      username: 'great_name',
-      email: 'user@gmail.com',
-      age: 25,
-      address: {
-        street: 'Main st.',
-        city: 'NYC',
-        state: 'NY'
-      }
-    }
-  */
-
-...
-
-```
-
-| Props/methods        | Definition           | Returns  |
-| ------------- |:-------------:| -----:|
-| value      | The value of the entire FormGroup or a single FormControl | Object \| any |
-| status      | The status of the FormGroup. If any of the FormControls are INVALID, the FormGroup is INVALID. If all the FormControls are VALID, the FormGroup will be VALID      |   "VALID" \| "INVALID" |
-| errors | An object of errors or null if there are none.      |    Object \| null |
-| pristine | True if the control or any child controls hasn't changed value    |  boolean  |
-| dirty | True if the control or any child controls has changed value.      |    boolean |
-| untouched | True if the control or any child controls hasn't been touched      |    boolean |
-| touched | True if the control or any child controls has been touched.      |    boolean |
-| get(path: string\|string[]) | Method which takes the path to a control: <code>.get("address.street")</code>   |    AbstractControl |
-| markAsTouched() | Sets the control's touched property to true, and all its child controls as well. Call this function upon the blur event of an input.   |    void |
-| markAsUntouched() | Sets the control's touched property to false, and all its child controls as well.  |    void |
-| markAsDirty() | Sets the control's pristine property to false, and all its child controls as well. Both .setValue() and .patchValue() already call this method.  |    void |
-| markAsPristine() | Sets the control's pristine property to true  |    void |
-| hasError(error: string) | Checks if the ```errors``` object contains the specified error  |    boolean |
-| reset() | Resets the control with a value of ```null```, pristine and untouched |    boolean |
 
 ## Full example
 
