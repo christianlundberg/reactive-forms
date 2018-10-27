@@ -768,7 +768,7 @@ export default class App extends Component {
 
     const formBuilder = new FormBuilder();
 
-    this.form: formBuilder.group({
+    this.form = formBuilder.group({
         name: ['', Validators.required],
         email: ['', [Validators.required, Validators.email]],
         address: formBuilder.group({
@@ -846,7 +846,7 @@ export default class App extends Component {
           />
         </View>
         <TouchableOpacity
-          disabled={this.state.form.invalid}
+          disabled={this.form.invalid}
           onPress={this.onSubmit}
           style={styles.button}>
           <Text style={styles.buttonText}>SAVE</Text>
